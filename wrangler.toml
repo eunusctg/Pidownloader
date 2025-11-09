@@ -1,0 +1,20 @@
+name = "pi-downloader"
+compatibility_date = "2025-11-09"
+
+# -------------------------------------------------
+# 1. Static assets (the HTML page)
+# -------------------------------------------------
+[[pages]]
+  # The folder that contains your static files
+  directory = "."
+
+  # Optional: set a custom domain later in the dashboard
+  # custom_domain = "pi-downloader.example.com"
+
+# -------------------------------------------------
+# 2. Functions (the /api/download endpoint)
+# -------------------------------------------------
+[[functions]]
+  # All .js files inside functions/ are automatically routed
+  # e.g. functions/api/download.js → https://<site>/api/download
+  directory = "functions"
