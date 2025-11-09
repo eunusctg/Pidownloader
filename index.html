@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pi Downloader - YouTube Video Downloader & Converter</title>
+    <meta name="description" content="Download and convert YouTube videos to MP4 or MP3 instantly with Pi Downloader. Fast, free, and easy to use."/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+        }
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            background: linear-gradient(to right, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        input[type="url"] {
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        input[type="url"]::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        input[type="url"]:focus {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+        }
+        .format-select {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .format-btn {
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid transparent;
+            border-radius: 50px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+        .format-btn.active, .format-btn:hover {
+            background: #ff8a00;
+            border-color: #ff8a00;
+            transform: translateY(-2px);
+        }
+        button.download-btn {
+            background: linear-gradient(to right, #ff8a00, #e52e71);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            margin-top: 10px;
+        }
+        button.download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+        button.download-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            width: 180px;
+            backdrop-filter: blur(5px);
+        }
+        .feature i {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .feature h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        .feature p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        footer {
+            margin-top: 50px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-left: 4px solid #ff8a00;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            display: none;
+            color: #ff6b6b;
+            margin-top: 10px;
+        }
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2rem; }
+            .container { padding: 30px 15px; }
+            .format-select { gap: 10px; }
+            .format-btn { padding: 10px 20px; font-size: 0.9rem; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+    <div class="container">
+        <h1>Pi Downloader</h1>
+        <p class="subtitle">Download YouTube videos in MP4 or convert to MP3 – Fast & Free!</p>
+
+        <div class="input-group">
+            <input type="url" id="videoUrl" placeholder="Paste YouTube URL here..." required />
+            
+            <div class="format-select">
+                <button type="button" class="format-btn active" data-format="mp4">MP4 Video</button>
+                <button type="button" class="format-btn" data-format="mp3">MP3 Audio</button>
+            </div>
+
+            <button class="download-btn" id="downloadBtn">
+                <i class="fas fa-download"></i> Download Now
+            </button>
+            <div class="error" id="errorMsg">An error occurred. Please try again.</div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 15px;">Preparing your download...</p>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-bolt"></i>
+                <h3>Lightning Fast</h3>
+                <p>Download in seconds</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-shield-alt"></i>
+                <h3>100% Safe</h3>
+                <p>No malware or ads</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Mobile Friendly</h3>
+                <p>Works on all devices</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2025 Pi Downloader. Free tool for personal use. Note: Respect YouTube's Terms of Service.
+    </footer>
+
+    <script>
+        // Format selection
+        const formatBtns = document.querySelectorAll('.format-btn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const videoUrlInput = document.getElementById('videoUrl');
+        const loading = document.getElementById('loading');
+        const errorMsg = document.getElementById('errorMsg');
+        let selectedFormat = 'mp4';
+
+        formatBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                formatBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedFormat = btn.getAttribute('data-format');
+            });
+        });
+
+        // Download handler
+        downloadBtn.addEventListener('click', async () => {
+            const url = videoUrlInput.value.trim();
+            if (!url || !isValidYouTubeUrl(url)) {
+                alert('Please enter a valid YouTube URL');
+                return;
+            }
+
+            // Show loading
+            loading.style.display = 'block';
+            errorMsg.style.display = 'none';
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing...';
+
+            try {
+                const response = await fetch('/api/download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ videoUrl: url, format: selectedFormat })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+                }
+
+                const data = await response.json();
+                const a = document.createElement('a');
+                a.href = data.downloadUrl;
+                a.download = data.filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                // Hide loading
+                loading.style.display = 'none';
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Now';
+            } catch (error) {
+                console.error(error);
+                errorMsg.textContent = error.message || 'Download failed. Please try again.';
+                errorMsg.style.display = 'block';
+                loading.style.display = 'none';
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Now';
+            }
+        });
+
+        function isValidYouTubeUrl(url) {
+            const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]{11}.*$/;
+            return regex.test(url);
+        }
+
+        // Allow Enter key to trigger download
+        videoUrlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                downloadBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
